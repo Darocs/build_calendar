@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Title }}</title>
+    <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
+</head>
+<body>
+    <header>
+        <h1>Мой сайт</h1>
+    </header>
+    <main>
+        {{ block "main" . }}{{ end }}
+    </main>
+    <footer>
+        <p>© 2025 Hugo</p>
+    </footer>
+</body>
+</html>

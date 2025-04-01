@@ -1,0 +1,19 @@
+@import url("https://fonts.googleapis.com/css2?family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap");
+* {
+  margin: 0;
+  padding: 0; }
+
+body {
+  font-family: "Merriweather", serif;
+  font-weight: 400;
+  color: white; }
+
+a {
+  text-decoration: none; }
+
+img {
+  min-width: 100%; }
+
+.wrapper {
+  background: linear-gradient(90deg, black 0%, #838383 47%, #666666 100%);
+  width: 100%; }
