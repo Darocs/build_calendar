@@ -13,12 +13,46 @@
             <span class="logo">Блог строителя</span>
             <nav>
                 <ul>
-                    <li class="active"><a href="#">Главная</a></li>
+                    <li class="active"><a href="/">Главная</a></li>
                     <li><a href="#">О нас</a></li>
                     <li><a href="#">Связь</a></li>
                 </ul>
             </nav>
-        </header>    
+        </header>  
+
+        <div class="news-container">
+            <main class="content">
+                <h1>Основной контент сайта</h1>
+                <p>Здесь может быть основной контент страницы...</p>
+            </main>
+    
+            <aside class="news-sidebar">
+                <div class="news-item">
+                    <a href="/news/news1/" class="news-link">
+                        <img src="{{ "images/news1.jpg" | relURL }}" alt="Новость 1">
+                        <div class="news-title">Заголовок новости 1</div>
+                    </a>
+                </div>
+            
+                <div class="news-item">
+                    <a href="/news/news2/" class="news-link">
+                        <img src="{{ "images/news2.jpg" | relURL }}" alt="Новость 2">
+                        <div class="news-title">Заголовок новости 2</div>
+                    </a>
+                </div>
+            
+                <div class="news-item">
+                    <a href="/news/news3/" class="news-link">
+                        <div class="news-title">Заголовок новости 3</div>
+                        <div class="news-text">Краткое описание новости, если нет картинки.</div>
+                    </a>
+                </div>
+            </aside>
+        </div>
+        
+        <footer>
+            <p>&copy; 2025 Все права защищены. Контакты: zavaruka@cofeiku.com</p>
+        </footer>
     </div>
 </body>
 
