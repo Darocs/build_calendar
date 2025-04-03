@@ -4,7 +4,8 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Document</title>
-        <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
+        <link rel="stylesheet" href="{{ "css/baseof.css" | relURL }}">
+        {{ block "head-links" . }}{{ end }}
     </head>
     <!-- {{ partial "sidebar.html" . }} -->
     <body>
