@@ -1,0 +1,58 @@
+.news-container {
+    width: 1400px;
+    margin: 0 auto;
+    display: flex;
+}
+
+.content {
+    flex: 3;
+}
+
+.news-sidebar {
+    flex: 1;
+    padding: 10px;
+    background: rgb(59, 59, 59);
+    border-left: 3px solid #1f1f1f;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border-radius: 10px;
+}
+
+.news-item {
+    background: rgb(34, 34, 34);
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+.news-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.news-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.news-item img {
+    width: 100%; /* Заполняет всю ширину блока */
+    max-width: 100%; /* Не выходит за границы родителя */
+    height: auto; /* Поддерживает пропорции */
+    object-fit: contain; /* Вмещает изображение без обрезки */
+    border-radius: 5px;
+}
+
+.news-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.news-text {
+    font-size: 14px;
+    color: #ffffff;
+}
