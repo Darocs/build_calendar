@@ -13,13 +13,7 @@
         <div class="wrapper">
             <header class="container">
                 <span class="logo">НЦ Большая цифра</span>
-                <nav>
-                    <ul>
-                        <li class="active"><a href="/">Главная</a></li>
-                        <li><a href="{{ "about/" | relURL }}">О нас</a></li>
-                        <li><a href="{{ "contact/" | relURL }}">Связь</a></li>
-                    </ul>
-                </nav>
+                {{ partial "navbar.html" (dict "ctx" .) }}
             </header>  
             <main>
                 {{ block "main" . }}{{ end }}
