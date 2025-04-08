@@ -3,7 +3,8 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Document</title>
+        <title>НЦ Большая цифра</title>
+        <link rel="icon" type="image/x-icon" href="{{ "images/logo/ncbc.ico" | relURL }}">
         <link rel="stylesheet" href="{{ "css/baseof.css" | relURL }}">
         {{ block "head-links" . }}{{ end }}
     </head>
@@ -11,12 +12,12 @@
     <body>
         <div class="wrapper">
             <header class="container">
-                <span class="logo">Блог строителя</span>
+                <span class="logo">НЦ Большая цифра</span>
                 <nav>
                     <ul>
                         <li class="active"><a href="/">Главная</a></li>
-                        <li><a href="#">О нас</a></li>
-                        <li><a href="#">Связь</a></li>
+                        <li><a href="{{ "about/" | relURL }}">О нас</a></li>
+                        <li><a href="{{ "contact/" | relURL }}">Связь</a></li>
                     </ul>
                 </nav>
             </header>  
