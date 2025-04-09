@@ -90,6 +90,7 @@ header nav ul li:not(.active) a:hover::after {
 
 header nav ul li.active a {
     position: relative;
+    font-weight: bold;
 }
 
 header nav ul li.active a::after {
