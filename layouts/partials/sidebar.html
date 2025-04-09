@@ -1,13 +1,15 @@
 <aside class="news-sidebar">
-    {{ range first 5 (where .Site.RegularPages "Section" "news") }}
+    {{ range first 3 (where .Site.RegularPages "Section" "news") }}
         <div class="news-item">
-            {{ if .Params.image }}
-                <img src="{{ .Params.image }}" alt="{{ .Title }}">
-            {{ end }}
-            <div class="news-title">{{ .Title }}</div>
-            {{ if not .Params.image }}
-                <div class="news-text">{{ .Summary }}</div>
-            {{ end }}
+            <a href="{{ .Permalink }}" class="news-link">
+                {{ if .Params.image }}
+                    <img src="{{ .Params.image }}" alt="{{ .Title }}">
+                {{ end }}
+                <div class="news-title">{{ .Title }}</div>
+                {{ if not .Params.image }}
+                    <div class="news-text">{{ .Summary }}</div>
+                {{ end }}
+            </a>
         </div>
     {{ end }}
 </aside>
