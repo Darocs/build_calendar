@@ -67,10 +67,6 @@ header nav ul li a {
     color: white;
 }
 
-header nav ul li.active a {
-    font-weight: bold;
-}
-
 header nav ul li:not(.active) a {
     position: relative;
     text-decoration: none;
@@ -92,10 +88,15 @@ header nav ul li:not(.active) a:hover::after {
     width: 100%;
 }
 
+header nav ul li.active a {
+    position: relative;
+}
 
-header nav ul li.active::after {
+header nav ul li.active a::after {
     content: "";
-    display: block;
+    position: absolute;
+    left: 0;
+    bottom: -5px;
     width: 65%;
     height: 5px;
     background: #b9d2fa;

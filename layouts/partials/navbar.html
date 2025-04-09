@@ -1,0 +1,15 @@
+{{ with .ctx }}
+<nav>
+  <ul>
+    <li class="{{ if eq .RelPermalink "/" }}active{{ end }}">
+      <a href="{{ "/" | relURL }}">Главная</a>
+    </li>
+    <li class="{{ if strings.HasPrefix .RelPermalink "/about/" }}active{{ end }}">
+      <a href="{{ "/about/" | relURL }}">О нас</a>
+    </li>
+    <li class="{{ if strings.HasPrefix .RelPermalink "/contact/" }}active{{ end }}">
+      <a href="{{ "/contact/" | relURL }}">Связь</a>
+    </li>
+  </ul>
+</nav>
+{{ end }}
