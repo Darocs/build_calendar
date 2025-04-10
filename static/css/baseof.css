@@ -28,6 +28,7 @@ img {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    justify-content: flex-start;
     padding-left: 30px;
     padding-right: 30px;
 }
@@ -90,6 +91,7 @@ header nav ul li:not(.active) a:hover::after {
 
 header nav ul li.active a {
     position: relative;
+    font-weight: bold;
 }
 
 header nav ul li.active a::after {
@@ -106,4 +108,5 @@ header nav ul li.active a::after {
 footer {
     text-align: center;
     padding: 15px;
+    margin-top: auto;
 }
