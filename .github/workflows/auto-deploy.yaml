@@ -29,4 +29,4 @@ jobs:
             cd /var/www/ncbc_buildblog
             git pull origin main
             hugo --minify
-            sudo systemctl restart angie
+            sudo angie -t && sudo systemctl restart angie
