@@ -1,5 +1,5 @@
 <aside class="news-sidebar">
-    {{ range first 3 (where .Site.RegularPages "Section" "news") }}
+    {{ range first 3 (where .Site.RegularPages.ByDate.Reverse "Section" "news") }}
         <div class="news-item">
             <a href="{{ .Permalink }}" class="news-link">
                 {{ if .Params.image }}
@@ -9,6 +9,7 @@
                 {{ if not .Params.image }}
                     <div class="news-text">{{ .Summary }}</div>
                 {{ end }}
+                <p class="data">{{ .Date | dateFormat "02.01.2006 15:04" }}</p>
             </a>
         </div>
     {{ end }}

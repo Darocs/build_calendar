@@ -1,3 +1,4 @@
 baseURL = "https://ncbc.kuwaiba.ru/"
 languageCode = 'en-us'
 title = 'НЦ Большая цифра'
+buildFuture = true
