@@ -1,7 +1,42 @@
+{{ define "head-links" }}
+    <link rel="stylesheet" href="{{ "css/single.css" | relURL }}">
+{{ end }}
+
 {{ define "main" }}
-    <article>
-        <h2>{{ .Title }}</h2>
-        <p>{{ .Date }}</p>
-        <div>{{ .Content }}</div>
-    </article>
+    <div class="article-container">
+        {{ if .Params.image }}
+            <div class="image-container">
+                <img id="myImg" src="{{ .Params.image }}" alt="Article Image">
+            </div>
+        {{ end }}
+
+        <div class="content">
+            <h2>{{ .Title }}</h2>
+            <p class="data">{{ .Date | dateFormat "02 January 2006 15:04" }}</p>
+            <p>{{ .Content }}</p>
+        </div>
+    </div>
+
+    {{ if .Params.image }}
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <img src="{{ .Params.image }}" alt="Enlarged Image">
+            </div>
+        </div>
+    {{ end }}
+
+    <script>
+        var modal = document.getElementById("myModal");
+        var img = document.getElementById("myImg");
+
+        img.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        modal.onclick = function(event) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
 {{ end }}
