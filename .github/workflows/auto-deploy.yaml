@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main  
+      - deploy-test
 
 jobs:
   deploy:
@@ -19,7 +20,7 @@ jobs:
         hugo-version: '0.121.0'
 
     - name: Build Hugo site
-      run: hugo --minify --source content
+      run: hugo --minify
 
     - name: Copy site via SSH
       uses: appleboy/scp-action@v0.1.4
