@@ -1,0 +1,32 @@
+name: Hugo Auto Deploy
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Hugo
+      uses: peaceiris/actions-hugo@v2
+      with:
+        hugo-version: '0.121.0'
+
+    - name: Build Hugo site
+      run: hugo --minify --source ncbc_buildblog
+
+    - name: Copy site via SSH
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: "ncbc_buildblog/public/*"     # Папка с сгенерированными файлами сайта
+        target: "/var/www/ncbc_buildblog"     # Путь на сервере, куда файлы будут скопированы
+
