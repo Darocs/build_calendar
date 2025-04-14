@@ -1,0 +1,89 @@
+<div class="calendar">
+    <div class="calendar-header">
+      <button id="prevMonth">&lt;</button>
+      <h2 id="calendarTitle"></h2>
+      <button id="nextMonth">&gt;</button>
+    </div>
+    <div class="calendar-weekdays">
+      <div>ПН</div><div>ВТ</div><div>СР</div><div>ЧТ</div><div>ПТ</div><div>СБ</div><div>ВС</div>
+    </div>
+    <div id="calendarDays" class="calendar-days"></div>
+  </div>
+  
+  <script>
+    const posts = [
+      {{ range where .Site.RegularPages "Type" "news" }}
+        {
+          date: new Date("{{ .Date.Format "2006-01-02" }}"),
+          title: "{{ .Title }}",
+          image: "{{ .Params.image }}",
+          url: "{{ .RelPermalink }}"
+        },
+      {{ end }}
+    ];
+  
+    let currentDate = new Date();
+  
+    function renderCalendar() {
+      const title = document.getElementById("calendarTitle");
+      const daysContainer = document.getElementById("calendarDays");
+      const month = currentDate.getMonth();
+      const year = currentDate.getFullYear();
+  
+      title.textContent = currentDate.toLocaleDateString("ru-RU", {
+        month: "long",
+        year: "numeric"
+      });
+  
+      const firstDay = new Date(year, month, 1);
+      const startDay = (firstDay.getDay() + 6) % 7;
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+  
+      daysContainer.innerHTML = "";
+  
+      for (let i = 0; i < startDay; i++) {
+        const empty = document.createElement("div");
+        empty.classList.add("calendar-day", "empty");
+        daysContainer.appendChild(empty);
+      }
+  
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dayDate = new Date(year, month, day);
+        const post = posts.find(p =>
+          p.date.getDate() === dayDate.getDate() &&
+          p.date.getMonth() === dayDate.getMonth() &&
+          p.date.getFullYear() === dayDate.getFullYear()
+        );
+  
+        const dayElem = document.createElement("div");
+        dayElem.classList.add("calendar-day");
+  
+        if (post) {
+          dayElem.innerHTML = `
+            <a href="${post.url}" target="_blank" title="${post.title}" style="display:block; width: 100%; height: 100%;">
+              <div style="width: 80%; aspect-ratio: 1/1; background-image: url('${post.image}'); background-size: cover; background-position: center; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                <span style="color: white; font-weight: bold; text-shadow: 0 0 3px black;">${String(day).padStart(2, '0')}</span>
+              </div>
+            </a>
+          `;
+        } else {
+          dayElem.innerHTML = `<div class="day-number">${day}</div>`;
+        }
+  
+        daysContainer.appendChild(dayElem);
+      }
+    }
+  
+    document.getElementById("prevMonth").addEventListener("click", () => {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+      renderCalendar();
+    });
+  
+    document.getElementById("nextMonth").addEventListener("click", () => {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+      renderCalendar();
+    });
+  
+    renderCalendar();
+  </script>
+  

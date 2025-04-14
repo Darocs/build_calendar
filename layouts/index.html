@@ -1,13 +1,10 @@
 {{ define "head-links" }}
-    <link rel="stylesheet" href="{{ "css/sidebar.css" | relURL }}">
+    <link rel="stylesheet" href="{{ "css/calendar.css" | relURL }}">
 {{ end }}
-{{ define "main" }}
-    <div class="news-container">
-        <main class="content">
-            <h1>Основной контент сайта</h1>
-            <p>Здесь может быть основной контент страницы...</p>
-        </main>
 
-        {{ partial "sidebar.html" . }}
+{{ define "main" }}
+    <div class="calendar-container">
+        <h1>Календарь</h1>
+        {{ partial "calendar.html" . }}
     </div>
 {{ end }}
