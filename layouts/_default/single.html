@@ -1,42 +1,73 @@
 {{ define "head-links" }}
-    <link rel="stylesheet" href="{{ "css/single.css" | relURL }}">
+  <link rel="stylesheet" href="{{ "css/single.css" | relURL }}">
 {{ end }}
 
 {{ define "main" }}
-    <div class="article-container">
-        {{ if .Params.image }}
-            <div class="image-container">
-                <img id="myImg" src="{{ .Params.image }}" alt="Article Image">
-            </div>
-        {{ end }}
+  <div class="article-container">
+    <div class="media-gallery">
+      {{- $media := .Params.media -}}
+      {{- if not $media }}
+        {{- $folder := .Params.media_folder -}}
+        {{- with $folder }}
+          {{- $fullPath := path.Join "assets" $folder -}}
+          {{- $files := readDir $fullPath -}}
+          {{- $media = slice -}}
+          {{- range $files }}
+            {{- $ext := lower (replace (path.Ext .Name) "." "") }}
+            {{- if in (slice "jpg" "jpeg" "png" "webp" "mp4") $ext }}
+              {{- $webPath := printf "/%s/%s" $folder .Name }}
+              {{- $tmp := slice $webPath }}
+              {{- $media = union $media $tmp }}
+            {{- end }}
+          {{- end }}          
+        {{- end }}
+      {{- end }}
 
-        <div class="content">
-            <h2>{{ .Title }}</h2>
-            <p class="data">{{ .Date | dateFormat "02 January 2006 15:04" }}</p>
-            <p>{{ .Content }}</p>
-        </div>
+      {{- range $media }}
+        {{ if in . "mp4" }}
+          <video controls class="media-item">
+            <source src="{{ . | relURL }}" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        {{ else }}
+          <img src="{{ . | relURL }}" alt="Media Image" class="media-item zoomable">
+        {{ end }}
+      {{ end }}
     </div>
 
-    {{ if .Params.image }}
-        <div id="myModal" class="modal">
-            <div class="modal-content">
-                <img src="{{ .Params.image }}" alt="Enlarged Image">
-            </div>
-        </div>
-    {{ end }}
+    <div class="content">
+      <h2>{{ .Title }}</h2>
+      <p class="data">{{ .Date | dateFormat "02.01.2006 15:04" }}</p>
+      <div class="text-content">{{ .Content }}</div>
+    </div>
+  </div>
 
-    <script>
-        var modal = document.getElementById("myModal");
-        var img = document.getElementById("myImg");
+  <!-- Модальное окно для изображений -->
+  <div id="modal" class="modal">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="modalImg">
+  </div>
 
-        img.onclick = function() {
-            modal.style.display = "block";
-        }
+  <script>
+    const modal = document.getElementById("modal");
+    const modalImg = document.getElementById("modalImg");
+    const close = document.getElementsByClassName("close")[0];
 
-        modal.onclick = function(event) {
-            if (event.target === modal) {
-                modal.style.display = "none";
-            }
-        }
-    </script>
+    document.querySelectorAll(".zoomable").forEach(img => {
+      img.onclick = function() {
+        modal.style.display = "block";
+        modalImg.src = this.src;
+      }
+    });
+
+    close.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    }
+  </script>
 {{ end }}
