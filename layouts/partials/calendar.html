@@ -1,10 +1,13 @@
 <div class="calendar">
   <div class="calendar-header">
     <button id="prevMonth">&lt;</button>
-    <h2 id="calendarTitle"></h2>
+    <h2 id="calendarTitle" class="calendar-title"></h2>
     <button id="nextMonth">&gt;</button>
   </div>
-  <div class="calendar-weekdays">
+
+  <div id="calendarYears" class="calendar-years"></div>
+
+  <div class="calendar-weekdays" id="calendarWeekdays">
     <div>ПН</div><div>ВТ</div><div>СР</div><div>ЧТ</div><div>ПТ</div><div>СБ</div><div>ВС</div>
   </div>
   <div id="calendarDays" class="calendar-days"></div>
@@ -18,7 +21,6 @@
       {
         "date": "{{ .Date.Format "2006-01-02" }}",
         "title": {{ .Title | jsonify }},
-        
         "image": {{- $imagePaths := slice -}}
           {{- $folder := .Params.media_folder -}}
           {{- $fullPath := path.Join "assets" $folder -}}
@@ -31,37 +33,91 @@
             {{- end -}}
           {{- end -}}
           {{- if gt (len $imagePaths) 0 }}{{ index $imagePaths 0 | jsonify }}{{ else }}""{{ end }},
-        
         "url": "{{ .RelPermalink }}"
       }
     {{- end -}}
   ]`);
 
-  posts.forEach(post => {
-    post.date = new Date(post.date);
-  });
-
-  console.log("Посты для календаря:");
-  posts.forEach(p => console.log(p.title, p.image));
+  posts.forEach(p => p.date = new Date(p.date));
 
   let currentDate = new Date();
+  let viewMode = "year";
 
-  function renderCalendar() {
-    const title = document.getElementById("calendarTitle");
-    const daysContainer = document.getElementById("calendarDays");
-    const month = currentDate.getMonth();
-    const year = currentDate.getFullYear();
+  const title = document.getElementById("calendarTitle");
+  const yearsContainer = document.getElementById("calendarYears");
+  const daysContainer = document.getElementById("calendarDays");
+  const weekdaysContainer = document.getElementById("calendarWeekdays");
+  const prevBtn = document.getElementById("prevMonth");
+  const nextBtn = document.getElementById("nextMonth");
 
+  function render() {
     title.textContent = currentDate.toLocaleDateString("ru-RU", {
-      month: "long",
-      year: "numeric"
+      year: "numeric",
+      ...(viewMode === "month" && { month: "long" })
     });
+
+    if (viewMode === "year") {
+      weekdaysContainer.style.display = "none";
+      daysContainer.style.display = "none";
+      renderYearView();
+    } else {
+      weekdaysContainer.style.display = "grid";
+      daysContainer.style.display = "grid";
+      renderMonthView();
+    }
+
+    // Отображение стрелок
+    const now = new Date();
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const nowYear = now.getFullYear();
+    const nowMonth = now.getMonth();
+
+    if (viewMode === "year") {
+      prevBtn.style.visibility = year > 2020 ? "visible" : "hidden";
+      nextBtn.style.visibility = year < nowYear ? "visible" : "hidden";
+    } else {
+      const isAfter2020 = year > 2020 || (year === 2020 && month > 0);
+      const isBeforeLastMonth = year < nowYear || (year === nowYear && month < 11);
+      prevBtn.style.visibility = isAfter2020 ? "visible" : "hidden";
+      nextBtn.style.visibility = isBeforeLastMonth ? "visible" : "hidden";
+    }
+  }
+
+  function renderYearView() {
+    yearsContainer.innerHTML = "";
+    yearsContainer.style.display = "grid";
+    yearsContainer.className = "calendar-years";
+
+    const months = [
+      "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+      "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+    ];
+
+    for (let m = 0; m < 12; m++) {
+      const monthBtn = document.createElement("div");
+      monthBtn.className = "calendar-month clickable-month";
+      monthBtn.textContent = months[m];
+      monthBtn.title = "Открыть месяц";
+      monthBtn.addEventListener("click", () => {
+        currentDate.setMonth(m);
+        viewMode = "month";
+        render();
+      });
+      yearsContainer.appendChild(monthBtn);
+    }
+  }
+
+  function renderMonthView() {
+    yearsContainer.style.display = "none";
+    daysContainer.innerHTML = "";
+
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
 
     const firstDay = new Date(year, month, 1);
     const startDay = (firstDay.getDay() + 6) % 7;
     const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    daysContainer.innerHTML = "";
 
     for (let i = 0; i < startDay; i++) {
       const empty = document.createElement("div");
@@ -70,11 +126,11 @@
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
-      const dayDate = new Date(year, month, day);
+      const dateObj = new Date(year, month, day);
       const post = posts.find(p =>
-        p.date.getDate() === dayDate.getDate() &&
-        p.date.getMonth() === dayDate.getMonth() &&
-        p.date.getFullYear() === dayDate.getFullYear()
+        p.date.getDate() === dateObj.getDate() &&
+        p.date.getMonth() === dateObj.getMonth() &&
+        p.date.getFullYear() === dateObj.getFullYear()
       );
 
       const dayElem = document.createElement("div");
@@ -82,12 +138,11 @@
 
       if (post) {
         dayElem.innerHTML = `
-          <a href="${post.url}" title="${post.title}" class="calendar-post-link">
+          <a href="${post.url}" class="calendar-post-link">
             <div class="calendar-post-image" style="background-image: url('${post.image}')">
               <span class="calendar-post-day">${String(day).padStart(2, '0')}</span>
             </div>
-          </a>
-        `;
+          </a>`;
       } else {
         dayElem.innerHTML = `<div class="day-number">${day}</div>`;
       }
@@ -96,15 +151,38 @@
     }
   }
 
-  document.getElementById("prevMonth").addEventListener("click", () => {
-    currentDate.setMonth(currentDate.getMonth() - 1);
-    renderCalendar();
+  title.addEventListener("click", () => {
+    if (viewMode === "month") {
+      viewMode = "year";
+      render();
+    }
   });
 
-  document.getElementById("nextMonth").addEventListener("click", () => {
-    currentDate.setMonth(currentDate.getMonth() + 1);
-    renderCalendar();
+  prevBtn.addEventListener("click", () => {
+    if (viewMode === "month") {
+      currentDate.setMonth(currentDate.getMonth() - 1);
+    } else if (currentDate.getFullYear() > 2020) {
+      currentDate.setFullYear(currentDate.getFullYear() - 1);
+    }
+    render();
   });
 
-  renderCalendar();
+  nextBtn.addEventListener("click", () => {
+    const now = new Date();
+    const nowYear = now.getFullYear();
+
+    if (viewMode === "month") {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+      if (year < nowYear || (year === nowYear && month < 11)) {
+        currentDate.setMonth(month + 1);
+      }
+    } else if (currentDate.getFullYear() < nowYear) {
+      currentDate.setFullYear(currentDate.getFullYear() + 1);
+    }
+
+    render();
+  });
+
+  render();
 </script>
