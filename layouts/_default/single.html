@@ -4,6 +4,10 @@
 
 {{ define "main" }}
   <div class="article-container">
+    <div class="content">
+      <p class="data">{{ .Date | dateFormat "02.01.2006" }}</p>
+      <a class="back-arrow" id="backBtn" href="/">← Назад</a>
+    </div>
     <div class="media-gallery">
       {{- $media := .Params.media -}}
       {{- if not $media }}
@@ -19,7 +23,7 @@
               {{- $tmp := slice $webPath }}
               {{- $media = union $media $tmp }}
             {{- end }}
-          {{- end }}          
+          {{- end }}
         {{- end }}
       {{- end }}
 
@@ -34,40 +38,45 @@
         {{ end }}
       {{ end }}
     </div>
-
-    <div class="content">
-      <h2>{{ .Title }}</h2>
-      <p class="data">{{ .Date | dateFormat "02.01.2006 15:04" }}</p>
-      <div class="text-content">{{ .Content }}</div>
-    </div>
   </div>
 
   <!-- Модальное окно для изображений -->
   <div id="modal" class="modal">
-    <span class="close">&times;</span>
+    <span class="close" id="closeModal">&times;</span>
     <img class="modal-content" id="modalImg">
   </div>
 
   <script>
+    // Показать модальное окно
     const modal = document.getElementById("modal");
     const modalImg = document.getElementById("modalImg");
-    const close = document.getElementsByClassName("close")[0];
-
-    document.querySelectorAll(".zoomable").forEach(img => {
-      img.onclick = function() {
-        modal.style.display = "block";
-        modalImg.src = this.src;
-      }
+    const closeBtn = document.getElementById("closeModal");
+  
+    document.querySelectorAll("img.zoomable").forEach(img => {
+      img.addEventListener("click", () => {
+        modal.style.display = "flex";
+        modalImg.src = img.src;
+      });
     });
-
-    close.onclick = function() {
+  
+    closeBtn.addEventListener("click", () => {
       modal.style.display = "none";
-    }
-
-    window.onclick = function(event) {
-      if (event.target === modal) {
+    });
+  
+    window.addEventListener("click", (e) => {
+      if (e.target === modal) {
         modal.style.display = "none";
       }
+    });
+  
+    // Назад на исходный месяц
+    const backBtn = document.getElementById("backBtn");
+    const params = new URLSearchParams(window.location.search);
+    const from = params.get("from");
+    if (from) {
+      const [year, month] = from.split("-");
+      backBtn.href = `/calendar?year=${year}&month=${month}`;
     }
   </script>
+  
 {{ end }}

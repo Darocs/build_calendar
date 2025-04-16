@@ -68,18 +68,19 @@
 
     // Отображение стрелок
     const now = new Date();
+    const minYear = 2024;
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
     const nowYear = now.getFullYear();
     const nowMonth = now.getMonth();
 
     if (viewMode === "year") {
-      prevBtn.style.visibility = year > 2020 ? "visible" : "hidden";
+      prevBtn.style.visibility = year > minYear ? "visible" : "hidden";
       nextBtn.style.visibility = year < nowYear ? "visible" : "hidden";
     } else {
-      const isAfter2020 = year > 2020 || (year === 2020 && month > 0);
+      const isAfter2024 = year > minYear || (year === minYear && month > 0);
       const isBeforeLastMonth = year < nowYear || (year === nowYear && month < 11);
-      prevBtn.style.visibility = isAfter2020 ? "visible" : "hidden";
+      prevBtn.style.visibility = isAfter2024 ? "visible" : "hidden";
       nextBtn.style.visibility = isBeforeLastMonth ? "visible" : "hidden";
     }
   }
