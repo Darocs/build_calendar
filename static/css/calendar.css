@@ -1,3 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@400;500&family=Roboto:wght@400;500&display=swap');
+
+body, .calendar {
+  font-family: 'Roboto', sans-serif;
+}
+
+.calendar-main-title,
+.calendar-header h2,
+.calendar-title,
+.calendar-year-label {
+  font-family: 'Merriweather', serif;
+}
+
+.calendar-main-title {
+  text-align: center;
+  font-size: 18pt;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
 .calendar-title {
   cursor: pointer;
   text-decoration: underline;

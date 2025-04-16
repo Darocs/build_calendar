@@ -13,9 +13,11 @@
     <div class="wrapper">
       <header>
         <div class="logo">
-          <img src="{{ "images/logo/logo-full-white.png" | relURL }}" alt="Логотип сайта">
+          <a href="https://nc-bc.ru">
+            <img src="{{ "images/logo/logo-full-white.png" | relURL }}" alt="Логотип сайта">
+          </a>
         </div>
-      </header>
+      </header>      
 
       <main class="container">
         {{ block "main" . }}{{ end }}
