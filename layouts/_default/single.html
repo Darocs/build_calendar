@@ -18,7 +18,8 @@
           {{- $media = slice -}}
           {{- range $files }}
             {{- $ext := lower (replace (path.Ext .Name) "." "") }}
-            {{- if in (slice "jpg" "jpeg" "png" "webp" "mp4") $ext }}
+            {{- $lowerName := lower .Name }}
+            {{- if and (in (slice "jpg" "jpeg" "png" "webp" "mp4") $ext) (not (in $lowerName "preview")) }}
               {{- $webPath := printf "/%s/%s" $folder .Name }}
               {{- $tmp := slice $webPath }}
               {{- $media = union $media $tmp }}
