@@ -7,6 +7,8 @@
     <button id="nextMonth">&gt;</button>
   </div>
 
+  <div id="calendarMonthDescription" class="calendar-month-description"></div>
+
   <div id="calendarYears" class="calendar-years"></div>
 
   <div class="calendar-weekdays" id="calendarWeekdays">
@@ -39,6 +41,18 @@
       }
     {{- end -}}
   ]`);
+
+  const monthDescriptions = JSON.parse(`[
+    {{- $calendarPages := where .Site.RegularPages "Section" "calendar" -}}
+    {{- range $index, $p := $calendarPages -}}
+      {{- if $index }},{{ end -}}
+      {
+        "month": "{{ $p.Params.month }}",
+        "html": {{ $p.Content | jsonify }}
+      }
+    {{- end -}}
+  ]`);
+
   posts.forEach(p => p.date = new Date(p.date));
 
   let currentDate = new Date();
@@ -50,6 +64,7 @@
   const weekdaysContainer = document.getElementById("calendarWeekdays");
   const prevBtn = document.getElementById("prevMonth");
   const nextBtn = document.getElementById("nextMonth");
+  const descContainer = document.getElementById("calendarMonthDescription");
 
   const activeMonths = posts.map(p => ({ y: p.date.getFullYear(), m: p.date.getMonth() }));
   const firstPost = posts.reduce((min, p) => p.date < min ? p.date : min, posts[0].date);
@@ -77,12 +92,25 @@
     if (viewMode === "year") {
       weekdaysContainer.style.display = "none";
       daysContainer.style.display = "none";
+      descContainer.style.display = "none";
       yearsContainer.style.display = "block";
       renderYearView();
     } else {
       weekdaysContainer.style.display = "grid";
       daysContainer.style.display = "grid";
       yearsContainer.style.display = "none";
+
+      const currentMonthStr = `${year}-${String(month + 1).padStart(2, '0')}`;
+      const desc = monthDescriptions.find(d => d.month === currentMonthStr);
+
+      if (desc) {
+        descContainer.innerHTML = desc.html;
+        descContainer.style.display = "block";
+      } else {
+        descContainer.innerHTML = "";
+        descContainer.style.display = "none";
+      }
+
       renderMonthView();
     }
 

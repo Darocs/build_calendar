@@ -171,6 +171,17 @@ body, .calendar {
   color: white;
 }
 
+.calendar-month-description {
+  font-size: 12pt;
+  font-family: 'Roboto', sans-serif;
+  margin-bottom: 20px;
+  background: #444;
+  padding: 10px 15px;
+  border-radius: 6px;
+  color: #ddd;
+  line-height: 1.5em;
+}
+
 /* Адаптивность */
 @media screen and (max-width: 600px) {
   .calendar {
