@@ -114,5 +114,19 @@
     document.addEventListener("scroll", toggleBottomNav);
     window.addEventListener("resize", toggleBottomNav);
     document.addEventListener("DOMContentLoaded", toggleBottomNav);
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft") {
+        const prevPostLink = document.querySelector(".nav-link.prev");
+        if (prevPostLink) {
+          window.location.href = prevPostLink.href;
+        }
+      } else if (e.key === "ArrowRight") {
+        const nextPostLink = document.querySelector(".nav-link.next");
+        if (nextPostLink) {
+          window.location.href = nextPostLink.href;
+        }
+      }
+    });  
   </script>
 {{ end }}

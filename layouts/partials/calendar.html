@@ -167,6 +167,8 @@
   }
 
   function renderMonthView() {
+    daysContainer.classList.remove("calendar-visible");
+    descContainer.classList.remove("calendar-visible");
     daysContainer.innerHTML = "";
 
     const year = currentDate.getFullYear();
@@ -206,6 +208,10 @@
 
       daysContainer.appendChild(dayElem);
     }
+    setTimeout(() => {
+      daysContainer.classList.add("calendar-visible");
+      descContainer.classList.add("calendar-visible");
+    }, 10); // небольшой таймаут для CSS transition    
   }
 
   title.addEventListener("click", () => {
@@ -215,21 +221,65 @@
     }
   });
 
+  function animateMonthChange(changeFn) {
+    const days = document.getElementById("calendarDays");
+    const desc = document.getElementById("calendarMonthDescription");
+  
+    days.classList.remove("calendar-visible");
+    days.classList.add("calendar-fade");
+    desc.classList.remove("calendar-visible");
+    desc.classList.add("calendar-fade");
+  
+    setTimeout(() => {
+      changeFn();
+  
+      render();
+  
+      days.classList.remove("calendar-fade");
+      days.classList.add("calendar-visible");
+      desc.classList.remove("calendar-fade");
+      desc.classList.add("calendar-visible");
+    }, 300);
+  }
+  
   prevBtn.addEventListener("click", () => {
-    currentDate.setMonth(currentDate.getMonth() - 1);
-    while (!isMonthWithPosts(currentDate.getFullYear(), currentDate.getMonth()) && currentDate >= firstPost) {
+    animateMonthChange(() => {
       currentDate.setMonth(currentDate.getMonth() - 1);
-    }
-    render();
+      while (!isMonthWithPosts(currentDate.getFullYear(), currentDate.getMonth()) && currentDate >= firstPost) {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+      }
+    });
   });
-
+  
   nextBtn.addEventListener("click", () => {
-    currentDate.setMonth(currentDate.getMonth() + 1);
-    while (!isMonthWithPosts(currentDate.getFullYear(), currentDate.getMonth()) && currentDate <= lastPost) {
+    animateMonthChange(() => {
       currentDate.setMonth(currentDate.getMonth() + 1);
+      while (!isMonthWithPosts(currentDate.getFullYear(), currentDate.getMonth()) && currentDate <= lastPost) {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+      }
+    });
+  });  
+
+  document.addEventListener("keydown", (e) => {
+    if (viewMode === "month") {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth();
+  
+      if (e.key === "ArrowLeft") {
+        const prevMonth = new Date(year, month - 1, 1);
+        if (prevMonth >= firstPost && isMonthWithPosts(prevMonth.getFullYear(), prevMonth.getMonth())) {
+          currentDate = prevMonth;
+          render();
+        }
+      } else if (e.key === "ArrowRight") {
+        const nextMonth = new Date(year, month + 1, 1);
+        if (nextMonth <= lastPost && isMonthWithPosts(nextMonth.getFullYear(), nextMonth.getMonth())) {
+          currentDate = nextMonth;
+          render();
+        }
+      }
     }
-    render();
-  });
+  });  
 
   render();
 </script>
