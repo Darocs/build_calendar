@@ -6,6 +6,7 @@
   <div class="article-container">
     <div class="content">
       <p class="data">{{ .Date | dateFormat "02.01.2006" }}</p>
+      <h1 class="post-title">{{ .Title }}</h1>
       <div class="nav-buttons" id="topNav">
         {{ with .PrevInSection }}
           <a href="{{ .RelPermalink }}" class="nav-link prev">← Предыдущий пост</a>
@@ -36,17 +37,23 @@
         {{- end }}
       {{- end }}
 
-      {{- range $media }}
-        {{ if in . "mp4" }}
+      {{- range $index, $item := $media }}
+        {{ if in $item "mp4" }}
           <video controls class="media-item">
-            <source src="{{ . | relURL }}" type="video/mp4">
+            <source src="{{ $item | relURL }}" type="video/mp4">
             Your browser does not support the video tag.
           </video>
         {{ else }}
-          <img src="{{ . | relURL }}" alt="Media Image" class="media-item zoomable">
+          <img src="{{ $item | relURL }}" alt="Media Image" class="media-item zoomable" loading="lazy" data-index="{{ $index }}">
         {{ end }}
-      {{ end }}
+      {{- end }}
     </div>
+
+    {{ if .Content }}
+      <div class="content text-content">
+        {{ .Content }}
+      </div>
+    {{ end }}
 
     <div class="content">
       <div class="nav-buttons bottom-nav-hidden" id="bottomNav">
@@ -61,72 +68,109 @@
     </div>
   </div>
 
-  <!-- Модальное окно для изображений -->
+  <!-- Модальное окно -->
   <div id="modal" class="modal">
     <span class="close" id="closeModal">&times;</span>
-    <img class="modal-content" id="modalImg">
+    <div class="modal-inner">
+      <div class="modal-nav left" id="modalPrev">&#10094;</div>
+      <img class="modal-content" id="modalImg">
+      <div class="modal-nav right" id="modalNext">&#10095;</div>
+    </div>
   </div>
 
-  <!-- Модалка -->
   <script>
-    document.querySelectorAll("img.zoomable").forEach(img => {
+    // Переменные и логика модального окна, свайпов, стрелок и клавиш
+    const images = Array.from(document.querySelectorAll("img.zoomable"));
+    const modal = document.getElementById("modal");
+    const modalImg = document.getElementById("modalImg");
+    const modalPrev = document.getElementById("modalPrev");
+    const modalNext = document.getElementById("modalNext");
+    const closeModal = document.getElementById("closeModal");
+    let currentIndex = -1;
+
+    function showImage(index) {
+      if (index >= 0 && index < images.length) {
+        modalImg.src = images[index].src;
+        currentIndex = index;
+        modalPrev.classList.toggle("hidden", index === 0);
+        modalNext.classList.toggle("hidden", index === images.length - 1);
+      }
+    }
+
+    images.forEach((img, i) => {
       img.addEventListener("click", () => {
-        document.getElementById("modal").style.display = "flex";
-        document.getElementById("modalImg").src = img.src;
+        modal.style.display = "flex";
+        showImage(i);
       });
     });
 
-    document.getElementById("closeModal").addEventListener("click", () => {
-      document.getElementById("modal").style.display = "none";
+    modalPrev.addEventListener("click", () => {
+      if (currentIndex > 0) showImage(currentIndex - 1);
     });
+
+    modalNext.addEventListener("click", () => {
+      if (currentIndex < images.length - 1) showImage(currentIndex + 1);
+    });
+
+    closeModal.addEventListener("click", () => modal.style.display = "none");
 
     window.addEventListener("click", e => {
-      if (e.target === document.getElementById("modal")) {
-        document.getElementById("modal").style.display = "none";
+      if (e.target === modal) modal.style.display = "none";
+    });
+
+    document.addEventListener("keydown", e => {
+      if (modal.style.display === "flex") {
+        if (e.key === "Escape") modal.style.display = "none";
+        else if (e.key === "ArrowLeft") showImage(currentIndex - 1);
+        else if (e.key === "ArrowRight") showImage(currentIndex + 1);
+      } else {
+        if (e.key === "ArrowLeft") {
+          const prevPost = document.querySelector(".nav-link.prev");
+          if (prevPost) location.href = prevPost.href;
+        }
+        if (e.key === "ArrowRight") {
+          const nextPost = document.querySelector(".nav-link.next");
+          if (nextPost) location.href = nextPost.href;
+        }
       }
     });
-  </script>
 
-  <!-- Навигация -->
-  <script>
-    // Назад на исходный месяц
+    // Свайп
+    let touchStartX = 0;
+    modalImg.addEventListener("touchstart", e => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+    modalImg.addEventListener("touchend", e => {
+      const touchEndX = e.changedTouches[0].screenX;
+      const diff = touchStartX - touchEndX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0 && currentIndex < images.length - 1) showImage(currentIndex + 1);
+        else if (diff < 0 && currentIndex > 0) showImage(currentIndex - 1);
+      }
+    });
+
+    // Переход на календарь
     const backBtn = document.getElementById("backBtn");
     const bottomBackBtn = document.getElementById("bottomBackBtn");
     const params = new URLSearchParams(window.location.search);
     const from = params.get("from");
     if (from) {
       const [year, month] = from.split("-");
-      const newHref = `/calendar?year=${year}&month=${month}`;
-      backBtn.href = newHref;
-      bottomBackBtn.href = newHref;
+      const calendarUrl = `/calendar?year=${year}&month=${month}`;
+      backBtn.href = calendarUrl;
+      bottomBackBtn.href = calendarUrl;
     }
 
-    // Показать нижние кнопки, если верхние вне видимости
+    // Показ нижнего меню при скролле
     const topNav = document.getElementById("topNav");
     const bottomNav = document.getElementById("bottomNav");
-
     function toggleBottomNav() {
       const rect = topNav.getBoundingClientRect();
-      const visible = rect.top >= 0 && rect.bottom <= window.innerHeight;
-      bottomNav.classList.toggle("bottom-nav-hidden", visible);
+      const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+      bottomNav.classList.toggle("bottom-nav-hidden", isVisible);
     }
-
     document.addEventListener("scroll", toggleBottomNav);
     window.addEventListener("resize", toggleBottomNav);
     document.addEventListener("DOMContentLoaded", toggleBottomNav);
-
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowLeft") {
-        const prevPostLink = document.querySelector(".nav-link.prev");
-        if (prevPostLink) {
-          window.location.href = prevPostLink.href;
-        }
-      } else if (e.key === "ArrowRight") {
-        const nextPostLink = document.querySelector(".nav-link.next");
-        if (nextPostLink) {
-          window.location.href = nextPostLink.href;
-        }
-      }
-    });  
   </script>
 {{ end }}
