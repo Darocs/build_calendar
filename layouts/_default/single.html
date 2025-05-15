@@ -1,42 +1,176 @@
 {{ define "head-links" }}
-    <link rel="stylesheet" href="{{ "css/single.css" | relURL }}">
+  <link rel="stylesheet" href="{{ "css/single.css" | relURL }}">
 {{ end }}
 
 {{ define "main" }}
-    <div class="article-container">
-        {{ if .Params.image }}
-            <div class="image-container">
-                <img id="myImg" src="{{ .Params.image }}" alt="Article Image">
-            </div>
+  <div class="article-container">
+    <div class="content">
+      <p class="data">{{ .Date | dateFormat "02.01.2006" }}</p>
+      <h1 class="post-title">{{ .Title }}</h1>
+      <div class="nav-buttons" id="topNav">
+        {{ with .PrevInSection }}
+          <a href="{{ .RelPermalink }}" class="nav-link prev">← Предыдущий пост</a>
         {{ end }}
-
-        <div class="content">
-            <h2>{{ .Title }}</h2>
-            <p class="data">{{ .Date | dateFormat "02 January 2006 15:04" }}</p>
-            <p>{{ .Content }}</p>
-        </div>
+        <a class="nav-link" id="backBtn" href="/">Календарь</a>
+        {{ with .NextInSection }}
+          <a href="{{ .RelPermalink }}" class="nav-link next">Следующий пост →</a>
+        {{ end }}
+      </div>
     </div>
 
-    {{ if .Params.image }}
-        <div id="myModal" class="modal">
-            <div class="modal-content">
-                <img src="{{ .Params.image }}" alt="Enlarged Image">
-            </div>
-        </div>
+    <div class="media-gallery">
+      {{- $media := .Params.media -}}
+      {{- if not $media }}
+        {{- $folder := .Params.media_folder -}}
+        {{- with $folder }}
+          {{- $fullPath := path.Join "assets" $folder -}}
+          {{- $files := readDir $fullPath -}}
+          {{- $media = slice -}}
+          {{- range $files }}
+            {{- $ext := lower (replace (path.Ext .Name) "." "") }}
+            {{- $lowerName := lower .Name }}
+            {{- if and (in (slice "jpg" "jpeg" "png" "webp" "mp4") $ext) (not (in $lowerName "preview")) }}
+              {{- $webPath := printf "/%s/%s" $folder .Name }}
+              {{- $media = union $media (slice $webPath) }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+
+      {{- range $index, $item := $media }}
+        {{ if in $item "mp4" }}
+          <video controls class="media-item">
+            <source src="{{ $item | relURL }}" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+        {{ else }}
+          <img src="{{ $item | relURL }}" alt="Media Image" class="media-item zoomable" loading="lazy" data-index="{{ $index }}">
+        {{ end }}
+      {{- end }}
+    </div>
+
+    {{ if .Content }}
+      <div class="content text-content">
+        {{ .Content }}
+      </div>
     {{ end }}
 
-    <script>
-        var modal = document.getElementById("myModal");
-        var img = document.getElementById("myImg");
+    <div class="content">
+      <div class="nav-buttons bottom-nav-hidden" id="bottomNav">
+        {{ with .PrevInSection }}
+          <a href="{{ .RelPermalink }}" class="nav-link prev">← Предыдущий пост</a>
+        {{ end }}
+        <a class="nav-link" id="bottomBackBtn" href="/">Календарь</a>
+        {{ with .NextInSection }}
+          <a href="{{ .RelPermalink }}" class="nav-link next">Следующий пост →</a>
+        {{ end }}
+      </div>
+    </div>
+  </div>
 
-        img.onclick = function() {
-            modal.style.display = "block";
-        }
+  <!-- Модальное окно -->
+  <div id="modal" class="modal">
+    <span class="close" id="closeModal">&times;</span>
+    <div class="modal-inner">
+      <div class="modal-nav left" id="modalPrev">&#10094;</div>
+      <img class="modal-content" id="modalImg">
+      <div class="modal-nav right" id="modalNext">&#10095;</div>
+    </div>
+  </div>
 
-        modal.onclick = function(event) {
-            if (event.target === modal) {
-                modal.style.display = "none";
-            }
+  <script>
+    // Переменные и логика модального окна, свайпов, стрелок и клавиш
+    const images = Array.from(document.querySelectorAll("img.zoomable"));
+    const modal = document.getElementById("modal");
+    const modalImg = document.getElementById("modalImg");
+    const modalPrev = document.getElementById("modalPrev");
+    const modalNext = document.getElementById("modalNext");
+    const closeModal = document.getElementById("closeModal");
+    let currentIndex = -1;
+
+    function showImage(index) {
+      if (index >= 0 && index < images.length) {
+        modalImg.src = images[index].src;
+        currentIndex = index;
+        modalPrev.classList.toggle("hidden", index === 0);
+        modalNext.classList.toggle("hidden", index === images.length - 1);
+      }
+    }
+
+    images.forEach((img, i) => {
+      img.addEventListener("click", () => {
+        modal.style.display = "flex";
+        showImage(i);
+      });
+    });
+
+    modalPrev.addEventListener("click", () => {
+      if (currentIndex > 0) showImage(currentIndex - 1);
+    });
+
+    modalNext.addEventListener("click", () => {
+      if (currentIndex < images.length - 1) showImage(currentIndex + 1);
+    });
+
+    closeModal.addEventListener("click", () => modal.style.display = "none");
+
+    window.addEventListener("click", e => {
+      if (e.target === modal) modal.style.display = "none";
+    });
+
+    document.addEventListener("keydown", e => {
+      if (modal.style.display === "flex") {
+        if (e.key === "Escape") modal.style.display = "none";
+        else if (e.key === "ArrowLeft") showImage(currentIndex - 1);
+        else if (e.key === "ArrowRight") showImage(currentIndex + 1);
+      } else {
+        if (e.key === "ArrowLeft") {
+          const prevPost = document.querySelector(".nav-link.prev");
+          if (prevPost) location.href = prevPost.href;
         }
-    </script>
+        if (e.key === "ArrowRight") {
+          const nextPost = document.querySelector(".nav-link.next");
+          if (nextPost) location.href = nextPost.href;
+        }
+      }
+    });
+
+    // Свайп
+    let touchStartX = 0;
+    modalImg.addEventListener("touchstart", e => {
+      touchStartX = e.changedTouches[0].screenX;
+    });
+    modalImg.addEventListener("touchend", e => {
+      const touchEndX = e.changedTouches[0].screenX;
+      const diff = touchStartX - touchEndX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0 && currentIndex < images.length - 1) showImage(currentIndex + 1);
+        else if (diff < 0 && currentIndex > 0) showImage(currentIndex - 1);
+      }
+    });
+
+    // Переход на календарь
+    const backBtn = document.getElementById("backBtn");
+    const bottomBackBtn = document.getElementById("bottomBackBtn");
+    const params = new URLSearchParams(window.location.search);
+    const from = params.get("from");
+    if (from) {
+      const [year, month] = from.split("-");
+      const calendarUrl = `/calendar?year=${year}&month=${month}`;
+      backBtn.href = calendarUrl;
+      bottomBackBtn.href = calendarUrl;
+    }
+
+    // Показ нижнего меню при скролле
+    const topNav = document.getElementById("topNav");
+    const bottomNav = document.getElementById("bottomNav");
+    function toggleBottomNav() {
+      const rect = topNav.getBoundingClientRect();
+      const isVisible = rect.top >= 0 && rect.bottom <= window.innerHeight;
+      bottomNav.classList.toggle("bottom-nav-hidden", isVisible);
+    }
+    document.addEventListener("scroll", toggleBottomNav);
+    window.addEventListener("resize", toggleBottomNav);
+    document.addEventListener("DOMContentLoaded", toggleBottomNav);
+  </script>
 {{ end }}
