@@ -1,0 +1,54 @@
+Работа с отчётностью проекта `calendar` (Hugo)
+
+Для работы нужно знать пароль от сервера nc-bc.ru, узнать у Быстрова А.А.
+
+1. Подключится к серверу
+
+    Откройте PowerShell от имени администратора и выполни:
+
+        ssh root@nc-bc.ru
+
+    Введите пароль
+
+
+2. Установка GoAccess на сервере nc-bc.ru (он скорее всего уже должен быть установлен, начните с проверки)
+
+    В терминале сервера выполните:
+
+        apt update
+        apt install goaccess -y
+
+    Проверка:
+
+        goaccess --version
+
+
+3. Генерация отчёта
+
+    В терминале сервера выполните:
+
+        goaccess /var/log/apache2/calendar_access.log -o /var/www/calendar/report.html --log-format=COMBINED
+
+    Пояснение:
+
+        /var/log/apache2/calendar_access.log — путь к логам Apache (убедись, что он актуален)
+
+        /var/www/calendar/report.html — отчёт будет доступен по адресу сайта
+
+        --log-format=COMBINED — стандартный формат логов Apache
+
+
+4. Открытие отчёта в браузере
+
+    После генерации открой в браузере:
+
+        https://calendar.nc-bc.ru/report.html
+
+
+5. Повторная генерация
+
+    В консоли на сервере снова введите:
+
+        goaccess /var/log/apache2/calendar_access.log -o /var/www/calendar/report.html --log-format=COMBINED
+
+    Удалять или подтверждать ничего не требуется
