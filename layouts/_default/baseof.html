@@ -6,6 +6,11 @@
     <title>НЦ Большая цифра</title>
     <link rel="icon" type="image/x-icon" href="{{ "images/logo/ncbc.ico" | relURL }}">
     <link rel="stylesheet" href="{{ "css/baseof.css" | relURL }}">
+
+    {{ if eq .Section "reports" }}
+      <link rel="stylesheet" href="{{ "css/reports.css" | relURL }}">
+    {{ end }}
+    
     {{ block "head-links" . }}{{ end }}
   </head>
 

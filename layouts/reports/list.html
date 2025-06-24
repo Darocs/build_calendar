@@ -1,0 +1,24 @@
+{{ define "main" }}
+<main class="container">
+  <a href="{{ "/" | relURL }}" class="btn-home">← На главную</a>
+
+  <h1 class="page-title">Еженедельные отчёты за последние 60 дней</h1>
+
+  <ul class="report-list">
+    {{ $reports := readDir "static/reports" }}
+    {{ range sort $reports "Name" "desc" }}
+      {{ if and (strings.HasSuffix .Name ".html") (ne .Name "all.html") }}
+        <li>
+          <a href="/reports/{{ .Name }}" target="_blank">
+            Отчёт за {{ replace (replace .Name ".html" "" ) "-" "." }}
+          </a>
+        </li>
+      {{ end }}
+    {{ end }}
+  </ul>
+
+  <div class="btn-container">
+    <a href="/reports/all.html" class="btn-all" target="_blank">За 60 дней</a>
+  </div>
+</main>
+{{ end }}

@@ -1,0 +1,4 @@
+---
+title: "Отчёты"
+type: "reports"
+---

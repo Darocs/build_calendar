@@ -16,3 +16,6 @@ Thumbs.db
 hugo_cache/
 
 assets/images/news
+/команды.txt
+/команды_для_отчётности.txt
+/static/reports/
